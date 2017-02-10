@@ -22,8 +22,12 @@ class UserController extends Controller
             'signup_code' => 'required',
 	    ));
 
-        $code = DB::table('codes')->where('id', '=', 1)->first();
-        if($request->signup_code != $code->signup_code){
+        $codes = DB::table('codes')->get();
+        if($request->signup_code == $codes[0]->signup_code){
+            $code = $request->signup_code;
+        }elseif($request->signup_code == $codes[1]->signup_code){
+            $code = $request->signup_code;
+        }else{
             return redirect()->route('getSignup')->withErrors('De registratiecode is incorrect');
         }
 
@@ -32,13 +36,26 @@ class UserController extends Controller
         $user->username = $request->username;
         $user->email = $request->email;
         $user->password = Hash::make($request->password);
+        if ($code == 'ROC') {
+            $user->isAdmin = 1;
+        }
 
         $user->save();
 
-        return redirect()->route('getLogin')->withSuccess('Registratie succesvol');
+        if ($code == 'ROC') {
+            return redirect()->route('getLogin')->withSuccess('Registratie succesvol');
+        }
+
+        $message = 'Volgende stappen zijn vereist om registratie te voltooien';
+        Session::put('company', true);
+        Session::put('userid', $user->id);
+        return redirect()->route('getCompany', $user->id)->withSuccess($message);
 
 
 
+    }
+    public function getCompany ($id) {
+        return view('pages.company')->withUser(DB::table('users')->where('id', '=', $id)->first());
     }
 
     public function postLogin (Request $request) {
@@ -57,14 +74,61 @@ class UserController extends Controller
     	if (!Hash::check($request->password, $user->password)) {
     		return redirect()->route('getLogin')->withErrors('Gebruikersnaam of Wachtwoord zijn incorrect');
     	}
+        if ($user->isAdmin == 1) {
+            Users::login($user);
+        }else{
+    	    Users::login($user, true);
+    	    if(empty($user->fk_company) && $user->fk_company != 0){
+                $message = 'Deze pagina moet nog ingevuld worden om de registratie te voltooien';
+                return redirect()->route('getCompany', $user->id)->withWarning($message);
+            }
+        }
 
-        Users::login($user);
-    	return redirect()->route('getHome');
+        return redirect()->route('getHome');
+
+
     }
 
     public function logout () {
         Users::Logout();
         return redirect()->route('getLogin');
 
+    }
+
+    public function postCompanySave(Request $request, $id)
+    {
+        DB::table('users')->where('id', '=', $id)->first();
+
+        $this->validate($request, array(
+            'name' => 'required|max:255|unique:company',
+            'email' => 'required|email|unique:company',
+            'starttime' => 'required|date_format:G:i:s',
+        ));
+
+        /**
+         * Insert company into database
+         * Returns id from inserted company
+         */
+        $company = DB::table('company')->insertGetId(
+            [
+                'name' => $request->name,
+                'email' => $request->email,
+                'starttime' => $request->starttime,
+            ]
+        );
+
+        /**
+         * Update user company
+         */
+        DB::table('users')
+            ->where('id', $id)
+            ->update(
+                [
+                    'fk_company' => $company
+                ]
+            );
+
+        $message = 'Uw bedrijf, '. DB::table('company')->where('id', '=', $company)->first()->name .', is geregistreerd en gelinkt aan uw account. Log nu in alstublieft.';
+        return redirect()->route('getLogin')->withSuccess($message);
     }
 }

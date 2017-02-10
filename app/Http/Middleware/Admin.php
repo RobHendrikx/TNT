@@ -14,5 +14,6 @@ class Admin
         }else{
             return redirect()->route('getLogin')->withError('U moet eerst inloggen.');
         }
+
     }
 }

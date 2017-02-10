@@ -23,6 +23,7 @@ class CreateInstantiesTable extends Migration
             $table->time('TotalTime');
             $table->string('Rfid');
             $table->boolean('Checkedin');
+            $table->integer('fk_company')->nullable(true);
         });
     }
 

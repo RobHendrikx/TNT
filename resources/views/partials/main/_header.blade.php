@@ -14,6 +14,7 @@
 {!! Html::style('assets/css/style.css') !!}
 {!! Html::style('assets/css/style-responsive.css') !!}
 {!! Html::style('css/jquery.bootgrid.min.css') !!}
+{!! Html::style('css/jquery.timepicker.css') !!}
 @yield('styles')
 
 <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->

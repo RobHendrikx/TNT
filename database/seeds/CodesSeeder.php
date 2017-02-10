@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class CodesSeeder extends Seeder
 {
@@ -12,6 +13,11 @@ class CodesSeeder extends Seeder
     public function run()
     {
         DB::table('codes')->insert([
+            'name' => 'admin',
+            'signup_code' => 'ROC'
+        ]);
+        DB::table('codes')->insert([
+            'name' => 'bedrijf',
             'signup_code' => 'TNT'
         ]);
     }

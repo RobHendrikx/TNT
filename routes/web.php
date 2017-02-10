@@ -28,6 +28,14 @@ Route::get('logout', 'UserController@logout')->name('logout');
 Route::get('signup', 'PagesController@getSignup')->name('getSignup');
 Route::post('signup', 'UserController@postSignup')->name('postSignup');
 
+
 Route::group(['middleware' => 'admin'], function () {
     Route::get('/', 'PagesController@getIndex')->name('getHome');
+    Route::get('/student/{id}', 'StudentController@getStudent')->name('getStudent');
+    Route::post('/student/{id}/save', 'StudentController@postStudent')->name('postStudent');
+});
+
+Route::group(['middleware' => 'company'], function () {
+    Route::get('signup/companies/{id}', 'UserController@getCompany')->name('getCompany');
+    Route::post('signup/companies/{id}/save', 'UserController@postCompanySave')->name('postCompany');
 });

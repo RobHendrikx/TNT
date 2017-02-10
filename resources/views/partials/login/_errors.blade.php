@@ -25,3 +25,15 @@
         </div>
     </div>
 @endif
+
+@if(session('warning'))
+    <div class="row" style="margin-top: 15px; padding-left: 20px; padding-right: 20px">
+        <div class="col-sm-12">
+            <div class="alert alert-warning">
+                <ul>
+                    {{ session('warning') }}
+                </ul>
+            </div>
+        </div>
+    </div>
+@endif

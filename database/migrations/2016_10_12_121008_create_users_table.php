@@ -18,6 +18,7 @@ class CreateUsersTable extends Migration
             $table->string('username');
             $table->string('email');
             $table->string('password');
+            $table->integer('fk_company')->nullable(true);
             $table->boolean('isAdmin')->default(0);
             $table->timestamps();
         });

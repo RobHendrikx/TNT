@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-    @include('partials.main._header')
+	@include('partials.main._header')
 
  	<body>
 		<div id="login-page">
